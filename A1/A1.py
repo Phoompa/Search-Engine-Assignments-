@@ -51,7 +51,42 @@ for filename in os.listdir('data'):
     with open(preprocessed_file_path, 'w', encoding='utf-8') as file:
         file.write(processed_text)
         
-print("Complete")
 print(f"Total unique words: {len(all_words)}")
-print(type(processed_tokens))
+print("Question 1 Completed")
 
+#Initialize the inverted index as a dictionary
+inverted_index = {}
+#iterate through each word in all_words
+for word in all_words:
+    #assign an empty set for each word in the dictionary
+    inverted_index[word] = set()
+
+
+#Iterate through preprocessed files.
+for filename in os.listdir(preprocessed_directory):
+    file_path = os.path.join(preprocessed_directory, filename)
+    print("Adding file to inverted index: ", filename)
+    
+    with open(file_path, 'r', encoding = 'utf-8') as file:
+        content = file.read()
+        #Create a set of words in the document
+        words = set(content.split())
+        
+        #iterates through each word 
+        for word in words:
+            #if word appears in dictionary, add filename to the corresponding set.
+            if word in inverted_index:
+                inverted_index[word].add(filename)
+                
+#print out the inverted index to see the structure
+#k and v represent key-value pairs. for key k, convert the set v into a list for each item in dictionary
+#print("Inverted Index: ", {k: list(v) for k, v in inverted_index.items()})  # Print a small sample for clarity
+#print("Inverted Index: ", inverted_index)
+
+#Decided to use this so I could view the entire dictionary. The print code above ^^ only showed me a sample
+# Write to a text file
+with open('inverted_index.txt', 'w') as file:
+    for key, values in inverted_index.items():
+        # Convert the set to a list and join with commas
+        values_list = ', '.join(values)
+        file.write(f"{key}: {values_list}\n")
