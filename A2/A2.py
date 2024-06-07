@@ -96,3 +96,51 @@ with open('positional_index.txt', 'w') as file:
         file.write("\n")
 
 print("Positional index complete")
+
+
+phrase = input("Please enter a phrase:   ")
+phrase = phrase.lower()
+
+words = phrase.split()
+
+#Dictionary to store the combined document positions for the phrase.
+phrase_positions = {}
+
+
+#collect positions for each word in the phrase
+for word in words:
+    if word in positional_index:
+        for document, positions in positional_index[word].items():
+            if document not in phrase_positions:
+                phrase_positions[document] = []
+            phrase_positions[document].extend(positions)
+            
+#sorting the positions in each document
+for doc in phrase_positions:
+    phrase_positions[doc].sort()
+
+#print:
+#for doc, positions in phrase_positions.items():
+    #print(f"{doc}: {positions}")
+    
+results = {}
+
+# Check for sequences of consecutive numbers matching the phrase length
+for doc, positions in phrase_positions.items():
+    if len(positions) < len(words):
+        continue  # Skip if there aren't enough positions
+
+    # Search for consecutive positions
+    for i in range(len(positions) - len(words) + 1):
+        # Check if the next positions are consecutive
+        if all(positions[i + j] == positions[i] + j for j in range(len(words))):
+            if doc not in results:
+                results[doc] = []
+            results[doc].extend(positions[i:i+len(words)])  # Extend flat list
+
+# Output the results:
+for doc, pos_list in results.items():
+    print(f"{doc}: {sorted(set(pos_list))}")  # Remove duplicates and sort
+    print("\n")
+
+
