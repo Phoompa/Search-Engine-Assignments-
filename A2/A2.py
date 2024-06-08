@@ -144,3 +144,14 @@ for doc, pos_list in results.items():
     print("\n")
 
 
+##################################################################
+# TF-IDF MATRIX
+"""
+Term Frequency
+Inverted Document Frequency
+
+Matrix = columns[[row],[row],[row]] <-- way to reduce storage size?
+
+
+"""
+
