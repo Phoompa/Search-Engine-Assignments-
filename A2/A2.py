@@ -1,8 +1,8 @@
 import os
 import nltk
-import numpy
-import pandas
-import matplotlib
+import numpy as np
+import pandas as pd
+import matplotlib as plt
 import re
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -97,11 +97,15 @@ with open('positional_index.txt', 'w') as file:
 
 print("Positional index complete")
 
+while True:
+    phrase = input("Please enter a phrase:   ")
+    phrase = phrase.lower()
 
-phrase = input("Please enter a phrase:   ")
-phrase = phrase.lower()
-
-words = phrase.split()
+    words = phrase.split()
+    if len(words) > 5:
+        print("Query length must be less than 5.")
+    else:
+        break
 
 #Dictionary to store the combined document positions for the phrase.
 phrase_positions = {}
@@ -153,5 +157,9 @@ Inverted Document Frequency
 Matrix = columns[[row],[row],[row]] <-- way to reduce storage size?
 
 
+same dataset as Q1
+
 """
+
+matrix = pd.Dataframe()
 
