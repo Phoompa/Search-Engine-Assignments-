@@ -7,6 +7,8 @@ import re
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
+DOC_TOTAL = 249
+
 #Download nltk stuff
 nltk.download('punkt')
 nltk.download('stopwords')
