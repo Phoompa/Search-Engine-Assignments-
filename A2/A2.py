@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import matplotlib as plt
 import re
+import math
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 
@@ -163,5 +164,15 @@ same dataset as Q1
 
 """
 
-matrix = pd.Dataframe()
+tf_dic = {}
+doc_count = {}
 
+for word in positional_index:
+    d = {}
+    for doc in positional_index[word]:
+        d.update({doc : len(positional_index[word][doc])})
+        
+    tf_dic.update({word : d.copy()})
+    doc_count.update({word : len(positional_index[word])})
+    
+    
