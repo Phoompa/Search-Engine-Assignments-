@@ -223,11 +223,17 @@ for word, count in query_count.items():
         case 'dn':
             query_vector[word] = (0.5 + 0.5* (count/term_total_max[doc][1]))*idf[word]
 
-#calculates dot product        
+#calculates dot product + cos similarity       
 rank = pd.Series()
+rank_cos = pd.Series()
+
 for doc, arr in matrix.items():
     rank[doc] = np.dot(query_vector,arr)
-    #rank[doc] = np.linalg.norm(query_vector - arr)
+    rank_cos[doc] = np.dot(query_vector,arr) / (np.linalg.norm(query_vector)*np.linalg.norm(arr))
 
-print("Top 5 Matched Documents:")
+
+print("Top 5 Matched Documents (dot product):")
 print(rank.sort_values(ascending=False).head())
+print()
+print("Top 5 Matched Documents (cosine similarity):")
+print(rank_cos.sort_values(ascending=False).head())
