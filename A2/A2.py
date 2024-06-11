@@ -210,19 +210,18 @@ for word in q:
 #initialize query vector
 query_vector = pd.Series(float(0), index=matrix.index)
 
-## dont know if this is correct to do, calculates tf of query based on scheme
 for word, count in query_count.items():
     match tf_variant:
         case 'bin':
-            query_vector[word] = 1
+            query_vector[word] = idf[word]
         case 'rc':
-            query_vector[word] = count
+            query_vector[word] = count*idf[word]
         case 'tf':
-            query_vector[word] = (count/(term_total_max[doc][0]))
+            query_vector[word] = (count/(term_total_max[doc][0]))*idf[word]
         case 'ln':
-            query_vector[word] = math.log(1+count)
+            query_vector[word] = math.log(1+count)*idf[word]
         case 'dn':
-            query_vector[word] = 0.5 + (0.5* (count/term_total_max[doc][1]))
+            query_vector[word] = (0.5 + 0.5* (count/term_total_max[doc][1]))*idf[word]
 
 #calculates dot product        
 rank = pd.Series()
