@@ -199,7 +199,10 @@ print("Done.\n")
 #enter query for query_vector                
 q = input("enter query: ")
 q = q.lower()
-q = q.split()
+q = word_tokenize(q)
+q = [word for word in q if word not in stop_words]
+q = [re.sub(r'[\W_]+', '', word) for word in q if word]
+q = [word for word in q if len(word) > 1]
 
 #count terms in query
 query_count = {}
@@ -213,17 +216,7 @@ for word in q:
 query_vector = pd.Series(float(0), index=matrix.index)
 
 for word, count in query_count.items():
-    match tf_variant:
-        case 'bin':
-            query_vector[word] = idf[word]
-        case 'rc':
-            query_vector[word] = count*idf[word]
-        case 'tf':
-            query_vector[word] = (count/(term_total_max[doc][0]))*idf[word]
-        case 'ln':
-            query_vector[word] = math.log(1+count)*idf[word]
-        case 'dn':
-            query_vector[word] = (0.5 + 0.5* (count/term_total_max[doc][1]))*idf[word]
+    query_vector[word] = count
 
 #calculates dot product + cos similarity       
 rank = pd.Series()
