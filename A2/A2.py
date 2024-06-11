@@ -173,7 +173,7 @@ matrix = pd.DataFrame(float(0), index=list(idf.keys()),columns=list(term_count.k
 
 #select tf variant to calculate
 while True:
-    tf_variant = input("Select term freq variant: bin | rc | tf | ln | dn")
+    tf_variant = input("Select term freq variant: bin | rc | tf | ln | dn: ")
     if tf_variant not in ['bin','rc','tf','ln','dn']:
         print("Invalid variant.")
     else:
