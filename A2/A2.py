@@ -178,7 +178,8 @@ while True:
         print("Invalid variant.")
     else:
         break 
-    
+
+print("\npopulating TF-IDF Matrix..")  
 for doc, values in term_count.items():
     for term, count in values.items():
         match tf_variant:
@@ -192,6 +193,7 @@ for doc, values in term_count.items():
                 matrix.loc[term,doc] = math.log(1+count)*idf[term]
             case 'dn':
                 matrix.loc[term,doc] = 0.5 + (0.5* (count/term_total_max[doc][1]))*idf[term]
+print("Done.\n")
 
 
 #enter query for query_vector                
@@ -232,7 +234,7 @@ for doc, arr in matrix.items():
     rank_cos[doc] = np.dot(query_vector,arr) / (np.linalg.norm(query_vector)*np.linalg.norm(arr))
 
 
-print("Top 5 Matched Documents (dot product):")
+print("\nTop 5 Matched Documents (dot product):")
 print(rank.sort_values(ascending=False).head())
 print()
 print("Top 5 Matched Documents (cosine similarity):")
