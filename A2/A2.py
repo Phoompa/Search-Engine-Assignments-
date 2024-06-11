@@ -2,7 +2,6 @@ import os
 import nltk
 import numpy as np
 import pandas as pd
-import matplotlib as plt
 import re
 import math
 from nltk.tokenize import word_tokenize
@@ -68,9 +67,14 @@ print("Question 1 Completed")
 #initialize the positional index as a dictionary
 positional_index = {}
 
+term_count = {} #counting number of times term appears in doc
+term_total_max = {} # {doc:[total # of terms, # of highest occuring term, highest occuring term]}
+
 #Load all words from preprocessed files and build the positional index:
 for filename in os.listdir(preprocessed_directory):
     file_path = os.path.join(preprocessed_directory,filename)
+    
+    temp = {}
     
     with open(file_path, 'r', encoding='utf-8') as file:
         content = file.read()
@@ -82,7 +86,13 @@ for filename in os.listdir(preprocessed_directory):
                 positional_index[word] = {}
             if filename not in positional_index[word]:
                 positional_index[word][filename] = []
+                temp[word] = 0
             positional_index[word][filename].append(index)
+            temp[word] += 1
+
+        term_count[filename] = temp.copy()
+        m = max(temp, key=temp.get)
+        term_total_max[filename] = [len(words), temp[m], m]
 #position that the word occurs in is relative to the list of words and not the number of characters. So if document contains "This is", "This" is at position 0 and "is" at position 1
             
             
@@ -153,26 +163,72 @@ for doc, pos_list in results.items():
 
 ##################################################################
 # TF-IDF MATRIX
-"""
-Term Frequency
-Inverted Document Frequency
 
-Matrix = columns[[row],[row],[row]] <-- way to reduce storage size?
-
-
-same dataset as Q1
-
-"""
-
-tf_dic = {}
-doc_count = {}
-
+idf = {} ## {term : score}
 for word in positional_index:
-    d = {}
-    for doc in positional_index[word]:
-        d.update({doc : len(positional_index[word][doc])})
-        
-    tf_dic.update({word : d.copy()})
-    doc_count.update({word : len(positional_index[word])})
+    idf[word] = math.log(DOC_TOTAL / (len(positional_index[word])+1))
+    # calculate idf score for each word and store in dict
     
+matrix = pd.DataFrame(float(0), index=list(idf.keys()),columns=list(term_count.keys()))
+
+#select tf variant to calculate
+while True:
+    tf_variant = input("Select term freq variant: bin | rc | tf | ln | dn")
+    if tf_variant not in ['bin','rc','tf','ln','dn']:
+        print("Invalid variant.")
+    else:
+        break 
     
+for doc, values in term_count.items():
+    for term, count in values.items():
+        match tf_variant:
+            case 'bin':
+                matrix.loc[term,doc] = idf[term]
+            case 'rc':
+                matrix.loc[term,doc] = count*idf[term]
+            case 'tf':
+                matrix.loc[term,doc] = (count/(term_total_max[doc][0]))*idf[term]
+            case 'ln':
+                matrix.loc[term,doc] = math.log(1+count)*idf[term]
+            case 'dn':
+                matrix.loc[term,doc] = 0.5 + (0.5* (count/term_total_max[doc][1]))*idf[term]
+
+
+#enter query for query_vector                
+q = input("enter query: ")
+q = q.lower()
+q = q.split()
+
+#count terms in query
+query_count = {}
+for word in q:
+    if word not in query_count.keys():
+        query_count[word] = 1
+    else:
+        query_count[word] += 1
+
+#initialize query vector
+query_vector = pd.Series(float(0), index=matrix.index)
+
+## dont know if this is correct to do, calculates tf of query based on scheme
+for word, count in query_count.items():
+    match tf_variant:
+        case 'bin':
+            query_vector[word] = 1
+        case 'rc':
+            query_vector[word] = count
+        case 'tf':
+            query_vector[word] = (count/(term_total_max[doc][0]))
+        case 'ln':
+            query_vector[word] = math.log(1+count)
+        case 'dn':
+            query_vector[word] = 0.5 + (0.5* (count/term_total_max[doc][1]))
+
+#calculates dot product        
+rank = pd.Series()
+for doc, arr in matrix.items():
+    rank[doc] = np.dot(query_vector,arr)
+    #rank[doc] = np.linalg.norm(query_vector - arr)
+
+print("Top 5 Matched Documents:")
+print(rank.sort_values(ascending=False).head())
