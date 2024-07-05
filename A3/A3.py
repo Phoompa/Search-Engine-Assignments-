@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-
+import os
 
 #Retrieve the web page
 url = "https://en.wikipedia.org/wiki/List_of_Canadian_provinces_and_territories_by_historical_population"
@@ -14,8 +14,10 @@ if response.status_code == 200: #status code of 200 indicates a successful reque
         print("Webpage retrieved successfully")
         
         #Decode the raw html using beautifulSoup
+        
         soup = BeautifulSoup(raw_html, 'html.parser')
-        print(soup.prettify()) #formats html and prints it
+        
+        print(soup.prettify(formatter="html")) #formats html and prints it
         
         #extract relevant tables
         tables = soup.find_all('table', {'class' : 'wikitable'})
@@ -45,10 +47,48 @@ if response.status_code == 200: #status code of 200 indicates a successful reque
                         
         #print the complete dictionary
         print(tables_dict)
-
+        print()
+        
+        print("Printing all <h2> text elements:")
+        h2_list = soup.find_all("h2")
+        for h2 in h2_list:
+            print(h2.text)
+        
+        print()
+        print("Printing all hyperlinks found in tables:")
+        hyperlinks = []
+        for table in tables:
+            for link in table.find_all('a'):
+                hyperlinks.append(link.get('href'))
+        print(hyperlinks)
+            
+        dir = "webpages"
+        
+        print()
+        print("Downloading other webpages from hyperlinks:")
+        hyperlinks = list(dict.fromkeys(hyperlinks))
+        for link in hyperlinks:
+            if link.startswith('#'):
+                continue
+            
+            url = "https://en.wikipedia.org"+link
+            response = requests.get(url)
+            if response.status_code != 200:
+                print(f"Failed to retrieve webpage: {response.status_code}")
+                break
+            
+            raw_html = response.text
+            soup = BeautifulSoup(raw_html, 'html.parser')
+            fn = soup.title.string
+            fp = os.path.join(dir, fn +".html")
+            print("Downloading webpage: " + fn)
+            f = open(fp,"wb")
+            f.write(soup.encode('utf8'))
+            f.close()
+            
+            
         
 else:
     print(f"Failed to retrieve webpage: {response.status_code}")
             
-        
         
