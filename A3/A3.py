@@ -50,16 +50,16 @@ if response.status_code == 200: #status code of 200 indicates a successful reque
         print()
         
         print("Printing all <h2> text elements:")
-        h2_list = soup.find_all("h2")
+        h2_list = soup.find_all("h2") #find all <h2> tags
         for h2 in h2_list:
-            print(h2.text)
+            print(h2.text) #print out extracted text from <h2> tags
         
         print()
-        print("Printing all hyperlinks found in tables:")
-        hyperlinks = []
+        print("Creating list of hyperlinks found in the table list:")
+        hyperlinks = [] 
         for table in tables:
-            for link in table.find_all('a'):
-                hyperlinks.append(link.get('href'))
+            for link in table.find_all('a'): #find all links
+                hyperlinks.append(link.get('href')) #extract text from links
         print(hyperlinks)
             
         dir = "webpages"
@@ -68,18 +68,19 @@ if response.status_code == 200: #status code of 200 indicates a successful reque
         print("Downloading other webpages from hyperlinks:")
         hyperlinks = list(dict.fromkeys(hyperlinks))
         for link in hyperlinks:
-            if link.startswith('#'):
+            if link.startswith('#'): #skip over citation notes
                 continue
             
-            url = "https://en.wikipedia.org"+link
+            url = "https://en.wikipedia.org"+link #combine domain url + page link
             response = requests.get(url)
+            
             if response.status_code != 200:
                 print(f"Failed to retrieve webpage: {response.status_code}")
                 break
             
             raw_html = response.text
             soup = BeautifulSoup(raw_html, 'html.parser')
-            fn = soup.title.string
+            fn = soup.title.string #name file names after titles of downloaded webpages
             fp = os.path.join(dir, fn +".html")
             print("Downloading webpage: " + fn)
             f = open(fp,"wb")
