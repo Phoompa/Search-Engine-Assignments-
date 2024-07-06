@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import os
+import re
 
 # Retrieve the web page
 url = "https://en.wikipedia.org/wiki/List_of_Canadian_provinces_and_territories_by_historical_population"
@@ -36,9 +37,9 @@ if response.status_code == 200:  # status code of 200 indicates a successful req
         for row in table.find_all('tr')[1:]:  # skip header row and iterate through each row in the table
             cells = row.find_all(['td', 'th']) #extract all cells in the given row
             if len(cells) == len(headers): 
-                name = sanitize(cells[0].get_text()) #get the name from the first cell
+                name = sanitize(re.sub(r"\[([a-z])*\]","",cells[0].get_text())) #get the name from the first cell
                 if name not in all_data: #Initialize the name entry if the name doesn't already exist
-                    all_data[name] = {header: "N/A" for header in all_periods}
+                    all_data[name] = {header: " " for header in all_periods}
                 
                 for i in range(1, len(headers)): #Loop through the remaining cells
                     period = headers[i] #get the period header
@@ -60,7 +61,7 @@ if response.status_code == 200:  # status code of 200 indicates a successful req
     for name, values in all_data.items(): # Iterate through each name and its associated values
         formatted_data['Name'].append(name) # add the name to the 'Name' list
         for period in ordered_periods: 
-            formatted_data[period].append(values.get(period, "N/A")) # Add the value for each period, "N/A" if it is missing
+            formatted_data[period].append(values.get(period, " ")) # Add the value for each period, "N/A" if it is missing
     print(formatted_data)
     print("------------------------------------")
     
@@ -68,7 +69,8 @@ if response.status_code == 200:  # status code of 200 indicates a successful req
     df = pd.DataFrame(formatted_data)
     
     #print the dataframe
-    df.head(60)
+    print(df.head(60))
+    
     print("Printing all <h2> text elements:")
     h2_list = soup.find_all("h2") #find all <h2> tags
     for h2 in h2_list:
