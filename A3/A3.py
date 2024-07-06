@@ -61,7 +61,7 @@ if response.status_code == 200:  # status code of 200 indicates a successful req
     for name, values in all_data.items(): # Iterate through each name and its associated values
         formatted_data['Name'].append(name) # add the name to the 'Name' list
         for period in ordered_periods: 
-            formatted_data[period].append(values.get(period, " ")) # Add the value for each period, "N/A" if it is missing
+            formatted_data[period].append(values.get(period, " ")) # Add the value for each period, " " if it is missing
     print(formatted_data)
     print("------------------------------------")
     
