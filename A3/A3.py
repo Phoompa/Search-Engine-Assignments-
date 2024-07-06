@@ -62,11 +62,12 @@ if response.status_code == 200: #status code of 200 indicates a successful reque
                 hyperlinks.append(link.get('href')) #extract text from links
         print(hyperlinks)
             
-        dir = "webpages"
+        dir = "webpages" #directory for downloaded webpages
         
         print()
         print("Downloading other webpages from hyperlinks:")
-        hyperlinks = list(dict.fromkeys(hyperlinks))
+        hyperlinks = list(dict.fromkeys(hyperlinks)) # remove duplicates
+        
         for link in hyperlinks:
             if link.startswith('#'): #skip over citation notes
                 continue
@@ -84,7 +85,7 @@ if response.status_code == 200: #status code of 200 indicates a successful reque
             fp = os.path.join(dir, fn +".html")
             print("Downloading webpage: " + fn)
             f = open(fp,"wb")
-            f.write(soup.encode('utf8'))
+            f.write(soup.encode('utf8')) #convert unicode to utf-8 for writing purposes
             f.close()
             
             
