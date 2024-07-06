@@ -82,16 +82,16 @@ if response.status_code == 200:  # status code of 200 indicates a successful req
             hyperlinks.append(link.get('href')) #extract text from links
     print(hyperlinks)
             
-        dir = "webpages" #directory for downloaded webpages
+    dir = "webpages" #directory for downloaded webpages
         
-        print()
-        print("Downloading other webpages from hyperlinks:")
-        hyperlinks = list(dict.fromkeys(hyperlinks)) # remove duplicates
+    print()
+    print("Downloading other webpages from hyperlinks:")
+    hyperlinks = list(dict.fromkeys(hyperlinks)) # remove duplicates
+    
+    for link in hyperlinks:
+        if link.startswith('#'): #skip over citation notes
+            continue
         
-        for link in hyperlinks:
-            if link.startswith('#'): #skip over citation notes
-                continue
-            
         url = "https://en.wikipedia.org"+link #combine domain url + page link
         response = requests.get(url)
             
@@ -99,15 +99,15 @@ if response.status_code == 200:  # status code of 200 indicates a successful req
             print(f"Failed to retrieve webpage: {response.status_code}")
             break
             
-            raw_html = response.text
-            soup = BeautifulSoup(raw_html, 'html.parser')
-            fn = soup.title.string #name file names after titles of downloaded webpages
-            fp = os.path.join(dir, fn +".html")
-            print("Downloading webpage: " + fn)
-            f = open(fp,"wb")
-            f.write(soup.encode('utf8')) #convert unicode to utf-8 for writing purposes
-            f.close()
-            
+        raw_html = response.text
+        soup = BeautifulSoup(raw_html, 'html.parser')
+        fn = soup.title.string #name file names after titles of downloaded webpages
+        fp = os.path.join(dir, fn +".html")
+        print("Downloading webpage: " + fn)
+        f = open(fp,"wb")
+        f.write(soup.encode('utf8')) #convert unicode to utf-8 for writing purposes
+        f.close()
+        
     
 
 else:
